@@ -1,0 +1,50 @@
+<?php
+
+	Class connectionDB {
+
+		public function __construct() {
+
+			$mysqli = new mysqli("localhost","root","","rgform");
+			if (!$mysqli->connect_error){
+				echo "Good connection</br>";
+				$this->host = $mysqli;
+			} else {
+				echo "Connection error!...</br>";
+				die();
+			}
+		}
+	}
+
+
+	Class putDate extends connectionDB {
+
+		function checkDate(){
+			$login = $_POST['login'];
+			$password = $_POST['password'];
+			if  ($login == '') {
+				echo "Bad login</br>";
+			}
+				if ($password == '') {
+					echo 'Bad password</br>';
+					die();
+				}
+			$query = $this->host->query("SELECT id,password FROM users  WHERE login ='".$login."'");
+			$row = $query->fetch_array(MYSQLI_NUM);
+			print($row[1]);
+
+			echo "password  = " .$password."</br>";
+
+			if ($row[1] == $password){
+				echo "good autorization!</br>";
+			} 
+			else {
+				echo "Bad login or password! Please, put correct login and password again!</br>";
+			}
+			
+		}
+	}
+
+	$object = new putDate;
+	$object->checkDate();
+
+?>
