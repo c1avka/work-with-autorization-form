@@ -1,0 +1,98 @@
+<?php
+
+	Class connectionDB {
+
+		public function __construct() {
+
+			$mysqli = new mysqli("localhost","root","","rgform");
+			if (!$mysqli->connect_error){
+				echo "Good connection</br>";
+				$this->host = $mysqli;
+			} else {
+				echo "Connection error!...</br>";
+				die();
+			}
+		}
+	}
+
+
+	Class putDate extends connectionDB {
+
+		public function checkDate() {
+
+			if (!isset($_POST['enter'])) {
+				$arr = array();
+				$login = $_POST['login'];
+				$password = $_POST['password'];
+				if (!preg_match("/^[a-zA-Z0-9]+$/", $login)) {
+					$arr[] = "Login must cosist of letter of Latin or numeral";
+				}
+
+					if ($password == '') {
+						$arr[] = 'Bad password';
+					}
+						if (count($arr) == 0 ) {	
+							$query = $this->host->query("SELECT id,password FROM users  WHERE login ='".$login."'");
+							$row = $query->fetch_array(MYSQLI_NUM);
+							if ($row[1] == $password){
+								echo "<p style='color:green;'>good autorization!<a href='index.html'>Come back</a></br>";
+								//header(Location:)
+							} 
+							else {
+								echo "Bad login or password! Please, put correct login and password again!<a href='index.html'> Come back</a> Or <a href='registerForm.html'>register in the system!</a></br> ";
+							}
+						} else {
+							echo "Errors: </br>";
+							foreach ($arr as $value){
+								print $value . "</br>";	 
+							}
+							
+						}
+			} else {
+				register();					
+			}
+		}
+
+		function register() {
+
+			if ((isset($_POST['registration'])) and (!isset($_POST['enter']))){
+				$log = trim($_POST['login']);
+				$pas = trim($_POST['password']);
+				$doublePass = trim($_POST['doublePassword']);
+				$err = array();
+				if  ($log == '') {
+					$err[] =  "Bad login";				
+				}
+					if ($pas == '') {
+						$err[] = 'Bad password';
+					}
+						if(($doublePass == '') or ($doublePass !== $pas)) {
+							$err[] =  "Bad double password!";
+						}
+				$query2 = $this->host->query("SELECT id FROM users WHERE login='".$log."'");	
+					if ($query2->num_rows > 0) {
+						$err[] = "This login is already exists, please input another! ";
+					}
+						if (count($err) == 0 ){
+							$query2 = $this->host->query("INSERT INTO users SET login ='".$log."', password = '".$pas."'");
+							echo "<p style='color:green;'> Registration is coming good!</p>";	
+						} else {
+								echo "<b>Error at the registration</b></br>";
+								foreach ($err as $error)
+								{
+									print $error."<br>";
+								}
+						}
+			}
+				else {
+					//exit;
+					echo "asdasd";
+			}
+		}
+	}
+
+	$object = new putDate;
+	$object->checkDate(); 
+	//$object->register();
+
+?>
